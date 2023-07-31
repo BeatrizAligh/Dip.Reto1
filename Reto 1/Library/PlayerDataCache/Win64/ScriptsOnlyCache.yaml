@@ -1090,7 +1090,7 @@ ScriptsOnlyBuild:
     className: ScrollRect
   - hash:
       serializedVersion: 2
-      Hash: b2fbda278434d64093aebc50e0f293cf
+      Hash: 18de00cf4d1cc84a8817d5545cbcb8b5
     assemblyName: Assembly-CSharp.dll
     namespaceName: 
     className: GhostCollider
