@@ -7,18 +7,15 @@ using UnityEngine.SceneManagement;
 
 public class GhostCollider : MonoBehaviour
 {
-    public Transform target; // El transform del jugador a seguir
-    public float chaseDistance = 10f; // Distancia máxima para comenzar a perseguir al jugador
     public float moveSpeed = 2f; // Velocidad de movimiento del fantasma
     public float destinationTolerance = 0.1f; // Tolerancia para considerar que el agente ha llegado a su destino
 
     private NavMeshAgent agent;
-    public bool isChasing; // Variable para controlar si el fantasma está persiguiendo al jugador
+    private bool isMovingRandomly = true;
 
     private void Start()
     {
         agent = GetComponent<NavMeshAgent>();
-        isChasing = false;
         StartCoroutine(MovementCoroutine());
     }
 
@@ -26,24 +23,20 @@ public class GhostCollider : MonoBehaviour
     {
         while (true)
         {
-            // Verificar si el jugador está dentro del rango de persecución
-            float distanceToTarget = Vector3.Distance(transform.position, target.position);
-            if (distanceToTarget <= chaseDistance)
+            if (isMovingRandomly)
             {
-                // Comenzar a perseguir al jugador
-                isChasing = true;
-                agent.SetDestination(target.position);
-            }
-            else
-            {
-                // Detener la persecución y moverse de forma aleatoria
-                isChasing = false;
+                // Mover el fantasma de forma aleatoria
                 Vector3 randomDestination = GetRandomNavMeshPoint();
                 agent.SetDestination(randomDestination);
             }
+            else
+            {
+                // Detener el movimiento del fantasma
+                agent.ResetPath();
+            }
 
             // Esperar a que el agente alcance su destino actual
-            while (agent.pathPending || agent.remainingDistance > destinationTolerance)
+            while (isMovingRandomly && (agent.pathPending || agent.remainingDistance > destinationTolerance))
             {
                 yield return null;
             }
@@ -71,7 +64,12 @@ public class GhostCollider : MonoBehaviour
             // Si el fantasma colisiona con el jugador, cambiar a la escena de perder
             SceneManager.LoadScene("Lose");
         }
+        else
+        {
+            // Si el fantasma colisiona con algún otro objeto, detener el movimiento aleatorio
+            isMovingRandomly = false;
+        }
     }
-
 }
+
 
